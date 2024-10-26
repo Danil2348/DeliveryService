@@ -1,11 +1,11 @@
-﻿using System;
+﻿using CsvHelper;
+using DeliveryService.Application.Interfaces.Repositories;
+using DeliveryService.Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using CsvHelper;
-using DeliveryService.Application.Interfaces.Repositories;
-using DeliveryService.Core.Entities;
 
 namespace DeliveryService.Infrastructure.FileStorage
 {
@@ -24,7 +24,7 @@ namespace DeliveryService.Infrastructure.FileStorage
         {
             try
             {
-                
+
                 using var reader = new StreamReader(_inputFilePath);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
                 return csv.GetRecords<Order>().ToList();

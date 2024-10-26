@@ -18,10 +18,10 @@ namespace DeliveryService.Application.Services
 
         public List<Order> FilterOrders(string district, DateTime firstDeliveryDateTime)
         {
-            
+
             var orders = _orderRepository.GetOrders();
             var endTime = firstDeliveryDateTime.AddMinutes(30);
-            
+
             return orders.Where(o => o.District == district &&
                                       o.DeliveryTime >= firstDeliveryDateTime &&
                                       o.DeliveryTime <= endTime)

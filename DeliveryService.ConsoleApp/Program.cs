@@ -1,13 +1,13 @@
-﻿using System;
-using System.IO;
+﻿using DeliveryService.Application.Interfaces.Repositories;
+using DeliveryService.Application.Interfaces.Services;
+using DeliveryService.Application.Services;
+using DeliveryService.Infrastructure.FileStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using DeliveryService.Application.Interfaces.Repositories;
-using DeliveryService.Application.Interfaces.Services;
-using DeliveryService.Application.Services;
-using DeliveryService.Infrastructure.FileStorage;
+using System;
+using System.IO;
 
 namespace DeliveryService.ConsoleApp
 {
@@ -15,44 +15,54 @@ namespace DeliveryService.ConsoleApp
     {
         static void Main(string[] args)
         {
-            // Убедитесь, что папка для логов существует
-            string logDirectory = "logs";
-            if (!Directory.Exists(logDirectory))
-            {
-                Directory.CreateDirectory(logDirectory);
-            }
+            var logDirectory = GetOrCreateLogDirectory();
 
-            // Настройка логирования с использованием Serilog
-            string logFilePath = Path.Combine(logDirectory, "delivery.log");
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console() // Логирование в консоль
-                .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day) // Логирование в файл
-                .CreateLogger();
+            ConfigureLogging(logDirectory);
 
-            // Создание конфигурации
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var serviceProvider = ConfigureServices(configuration); // Передаем конфигурацию в метод
+            var serviceProvider = ConfigureServices(configuration);
             var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
             var orderService = serviceProvider.GetRequiredService<IOrderService>();
+
+            if (!ValidateInputArguments(args, logger,
+                out var cityDistrict, out var firstDeliveryDateTime)) return;
+
+            FilterAndSaveOrders(configuration, logger,
+                orderService, cityDistrict, firstDeliveryDateTime);
+
+            Log.CloseAndFlush();
+        }
+
+        private static bool ValidateInputArguments(string[] args, ILogger<Program> logger,
+            out string cityDistrict, out DateTime firstDeliveryDateTime)
+        {
+            cityDistrict = null;
+            firstDeliveryDateTime = default;
 
             if (args.Length < 2)
             {
                 logger.LogError("Необходимо указать район и время первой доставки.");
-                return;
+                return false;
             }
 
-            string cityDistrict = args[0];
-            if (!DateTime.TryParse(args[1], out DateTime firstDeliveryDateTime))
+            cityDistrict = args[0];
+
+            if (!DateTime.TryParse(args[1], out firstDeliveryDateTime))
             {
                 logger.LogError("Некорректный формат времени. Убедитесь, что время указано в формате: гггг-ММ-дд ЧЧ:мм:сс.");
-                return;
+                return false;
             }
 
+            return true;
+        }
+
+        private static void FilterAndSaveOrders(IConfigurationRoot configuration, ILogger<Program> logger,
+            IOrderService orderService, string cityDistrict, DateTime firstDeliveryDateTime)
+        {
             try
             {
                 var filteredOrders = orderService.FilterOrders(cityDistrict, firstDeliveryDateTime);
@@ -72,13 +82,30 @@ namespace DeliveryService.ConsoleApp
             {
                 logger.LogError($"Произошла ошибка при обработке заказов: {ex.Message}");
             }
-            finally
-            {
-                Log.CloseAndFlush(); // Закрытие логирования при завершении приложения
-            }
         }
 
-        private static ServiceProvider ConfigureServices(IConfiguration configuration) // Принимаем IConfiguration как параметр
+        private static void ConfigureLogging(string logDirectory)
+        {
+            string logFilePath = Path.Combine(logDirectory, "delivery.log");
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+        }
+
+        private static string GetOrCreateLogDirectory()
+        {
+            string logDirectory = "logs";
+            if (!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+
+            return logDirectory;
+        }
+
+        private static ServiceProvider ConfigureServices(IConfiguration configuration)
         {
             return new ServiceCollection()
                 .AddLogging(builder =>
@@ -86,7 +113,8 @@ namespace DeliveryService.ConsoleApp
                     builder.AddSerilog();
                     builder.SetMinimumLevel(LogLevel.Debug);
                 })
-                .AddSingleton<IOrderRepository>(new OrderRepository(configuration["OrdersFilePath"], configuration["FilteredOrdersFilePath"]))
+                .AddSingleton<IOrderRepository>(new OrderRepository(
+                    configuration["OrdersFilePath"], configuration["FilteredOrdersFilePath"]))
                 .AddTransient<IOrderService, OrderService>()
                 .BuildServiceProvider();
         }
