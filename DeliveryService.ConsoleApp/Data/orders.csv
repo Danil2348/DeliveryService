@@ -1,0 +1,4 @@
+OrderId,Weight,District,DeliveryTime
+1,5.0,Downtown,2024-10-24 12:00:00
+2,2.0,Downtown,2024-10-24 12:15:00
+3,3.0,Uptown,2024-10-24 12:30:00
