@@ -11,7 +11,7 @@ using System.IO;
 
 namespace DeliveryService.ConsoleApp
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -37,7 +37,7 @@ namespace DeliveryService.ConsoleApp
             Log.CloseAndFlush();
         }
 
-        private static bool ValidateInputArguments(string[] args, ILogger<Program> logger,
+        public static bool ValidateInputArguments(string[] args, ILogger<Program> logger,
             out string cityDistrict, out DateTime firstDeliveryDateTime)
         {
             cityDistrict = null;
@@ -60,7 +60,7 @@ namespace DeliveryService.ConsoleApp
             return true;
         }
 
-        private static void FilterAndSaveOrders(IConfigurationRoot configuration, ILogger<Program> logger,
+        public static void FilterAndSaveOrders(IConfigurationRoot configuration, ILogger<Program> logger,
             IOrderService orderService, string cityDistrict, DateTime firstDeliveryDateTime)
         {
             try
