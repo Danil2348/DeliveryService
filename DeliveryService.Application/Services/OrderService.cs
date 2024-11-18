@@ -1,4 +1,4 @@
-﻿using DeliveryService.Application.Interfaces.Repositories;
+﻿using DeliveryService.Domain.Interfaces.Repositories;
 using DeliveryService.Application.Interfaces.Services;
 using DeliveryService.Core.Entities;
 using System;

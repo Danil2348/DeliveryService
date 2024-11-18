@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DeliveryService.Application\DeliveryService.Application.csproj" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\DeliveryService.Application\DeliveryService.Application.csproj" />
   </ItemGroup>
 
 </Project>

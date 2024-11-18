@@ -7,7 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace DeliveryService.Infrastructure.FileStorage
+namespace DeliveryService.Infrastructure.Repositories
 {
     public class OrderRepository : IOrderRepository
     {

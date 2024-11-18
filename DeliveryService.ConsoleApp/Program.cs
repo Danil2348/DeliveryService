@@ -1,7 +1,7 @@
-﻿using DeliveryService.Application.Interfaces.Repositories;
+﻿using DeliveryService.Domain.Interfaces.Repositories;
 using DeliveryService.Application.Interfaces.Services;
 using DeliveryService.Application.Services;
-using DeliveryService.Infrastructure.FileStorage;
+using DeliveryService.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

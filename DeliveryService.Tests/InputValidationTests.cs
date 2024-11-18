@@ -17,7 +17,7 @@ namespace DeliveryService.Tests
 
             Assert.False(result);
             Assert.Null(cityDistrict);
-            Assert.Equal(default(DateTime), firstDeliveryDateTime);
+            Assert.Equal(default, firstDeliveryDateTime);
 
             LoggerMock.Verify(logger => logger.Log(
                 LogLevel.Error,
@@ -36,7 +36,7 @@ namespace DeliveryService.Tests
 
             Assert.False(result);
             Assert.Equal("District", cityDistrict);
-            Assert.Equal(default(DateTime), firstDeliveryDateTime);
+            Assert.Equal(default, firstDeliveryDateTime);
 
             LoggerMock.Verify(logger => logger.Log(
                 LogLevel.Error,
