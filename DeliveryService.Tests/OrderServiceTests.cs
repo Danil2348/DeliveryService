@@ -15,10 +15,13 @@ namespace DeliveryService.Tests
         {
             var cityDistrict = "District";
             var firstDeliveryDateTime = DateTime.Now;
+            var allOrders = new List<Order> { new Order() };
+            var filteredOrders = new List<Order> { new Order() }; 
 
-            var filteredOrders = new List<Order> { new Order() }; // Предположим, что Order — это ваш класс заказа.
+            OrderServiceMock.Setup(service => service.LoadAllOrders())
+                .Returns(allOrders);
 
-            OrderServiceMock.Setup(service => service.FilterOrders(cityDistrict, firstDeliveryDateTime))
+            OrderServiceMock.Setup(service => service.FilterOrders(cityDistrict, firstDeliveryDateTime, allOrders))
                 .Returns(filteredOrders);
 
             var configurationMock = new Mock<IConfigurationRoot>();
