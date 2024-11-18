@@ -16,47 +16,27 @@ namespace DeliveryService.Application.Services
             _orderRepository = orderRepository;
         }
 
-        public List<Order> FilterOrders(string district, DateTime firstDeliveryDateTime)
+        public List<Order> FilterOrders(string district, DateTime firstDeliveryDateTime, List<Order> orders)
         {
-
-            var orders = _orderRepository.GetOrders();
             var endTime = firstDeliveryDateTime.AddMinutes(30);
-
-            return orders.Where(o => o.District == district &&
-                                      o.DeliveryTime >= firstDeliveryDateTime &&
-                                      o.DeliveryTime <= endTime)
-                         .Select(o => new Order
-                         {
-                             OrderId = o.OrderId,
-                             Weight = o.Weight,
-                             District = o.District,
-                             DeliveryTime = o.DeliveryTime
-                         }).ToList();
+            var filteredOrders = orders
+                .Where(o => o.District == district
+                      && o.DeliveryTime >= firstDeliveryDateTime
+                      && o.DeliveryTime <= endTime)
+                .ToList();
+            return filteredOrders;
         }
 
         public void SaveFilteredOrders(List<Order> filteredOrders, string outputFilePath)
         {
-            var ordersToSave = filteredOrders.Select(o => new Order
-            {
-                OrderId = o.OrderId,
-                Weight = o.Weight,
-                District = o.District,
-                DeliveryTime = o.DeliveryTime
-            }).ToList();
-
+            var ordersToSave = filteredOrders.ToList();
             _orderRepository.SaveOrders(ordersToSave);
         }
 
         public List<Order> LoadAllOrders()
         {
             var orders = _orderRepository.GetOrders();
-            return orders.Select(o => new Order
-            {
-                OrderId = o.OrderId,
-                Weight = o.Weight,
-                District = o.District,
-                DeliveryTime = o.DeliveryTime
-            }).ToList();
+            return orders;
         }
     }
 }

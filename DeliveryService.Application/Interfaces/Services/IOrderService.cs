@@ -6,7 +6,7 @@ namespace DeliveryService.Application.Interfaces.Services
 {
     public interface IOrderService
     {
-        List<Order> FilterOrders(string district, DateTime firstDeliveryDateTime);
+        List<Order> FilterOrders(string district, DateTime firstDeliveryDateTime, List<Order> orders);
         void SaveFilteredOrders(List<Order> filteredOrders, string outputFilePath);
         List<Order> LoadAllOrders();
     }
