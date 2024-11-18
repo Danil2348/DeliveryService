@@ -65,7 +65,8 @@ namespace DeliveryService.ConsoleApp
         {
             try
             {
-                var filteredOrders = orderService.FilterOrders(cityDistrict, firstDeliveryDateTime);
+                var orders = orderService.LoadAllOrders();
+                var filteredOrders = orderService.FilterOrders(cityDistrict, firstDeliveryDateTime, orders);
 
                 var outputFilePath = configuration["FilteredOrdersFilePath"];
 
